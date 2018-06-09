@@ -92,7 +92,6 @@ def Stop_word_remove(werb_list, stop_word_list1):
         if not exist:
             werb_list2.append(werb_list_index)
 
-
     return werb_list2
 
 
@@ -256,7 +255,17 @@ def read_search_index():
 
 
 def search(incidence_matrix, search_list):
-    print()
+    result_list = []
+    for search_list_pointer, search_list_index in enumerate(search_list):
+        for incidence_matrix_pointer, incidence_matrix_index in enumerate(incidence_matrix):
+            if incidence_matrix_pointer != 0:
+                if search_list_index == incidence_matrix_index[0]:
+                    for search_pointer, search_index in enumerate(incidence_matrix_index):
+                        if search_pointer != 0:
+                            if search_index == "1":
+                                result_list.append(incidence_matrix[0][search_pointer])
+
+    print(result_list)
 
 
 # get files directory from user and check it for exist.
@@ -604,34 +613,41 @@ del text_incidence_matrix_after_load_temp
 favorite_incidence_matrix_after_load = read_file_into_list(favorite_incidence_matrix_after_load_temp)
 del favorite_incidence_matrix_after_load_temp
 
-search_index = read_search_index()
-search_case_list = Tokenizing(search_index[1])
-search_case_list = Normalizing(search_case_list)
-search_case_list = Stop_word_remove(search_case_list, stop_word_list)
-search_case_list = Porter_algoritm(search_case_list)
+print("\n" + "files is loaded." + "\n")
 
-#print(search_case_list)
-#print(stop_word_list)
+while True:
 
-if int(search_index[0]) == 1:
-    search(day_incidence_matrix_after_load, search_case_list)
-elif int(search_index[0]) == 2:
-    search(month_incidence_matrix_after_load, search_case_list)
-elif int(search_index[0]) == 3:
-    search(year_incidence_matrix_after_load, search_case_list)
-elif int(search_index[0]) == 4:
-    search(author_incidence_matrix_after_load, search_case_list)
-elif int(search_index[0]) == 5:
-    search(text_incidence_matrix_after_load, search_case_list)
-elif int(search_index[0]) == 6:
-    search(favorite_incidence_matrix_after_load, search_case_list)
-elif int(search_index[0]) == 7:
-    search(day_incidence_matrix_after_load, search_case_list)
-    search(month_incidence_matrix_after_load, search_case_list)
-    search(year_incidence_matrix_after_load, search_case_list)
-    search(author_incidence_matrix_after_load, search_case_list)
-    search(text_incidence_matrix_after_load, search_case_list)
-    search(favorite_incidence_matrix_after_load, search_case_list)
+    search_index = read_search_index()
+    search_case_list = Tokenizing(search_index[1])
+    search_case_list = Normalizing(search_case_list)
+    search_case_list = Stop_word_remove(search_case_list, stop_word_list)
+    search_case_list = Porter_algoritm(search_case_list)
+
+    # print(search_case_list)
+    # print(stop_word_list)
+
+    if int(search_index[0]) == 1:
+        search(day_incidence_matrix_after_load, search_case_list)
+    elif int(search_index[0]) == 2:
+        search(month_incidence_matrix_after_load, search_case_list)
+    elif int(search_index[0]) == 3:
+        search(year_incidence_matrix_after_load, search_case_list)
+    elif int(search_index[0]) == 4:
+        search(author_incidence_matrix_after_load, search_case_list)
+    elif int(search_index[0]) == 5:
+        search(text_incidence_matrix_after_load, search_case_list)
+    elif int(search_index[0]) == 6:
+        search(favorite_incidence_matrix_after_load, search_case_list)
+    elif int(search_index[0]) == 7:
+        search(day_incidence_matrix_after_load, search_case_list)
+        search(month_incidence_matrix_after_load, search_case_list)
+        search(year_incidence_matrix_after_load, search_case_list)
+        search(author_incidence_matrix_after_load, search_case_list)
+        search(text_incidence_matrix_after_load, search_case_list)
+        search(favorite_incidence_matrix_after_load, search_case_list)
+
+
+
 
 """
 print(day_list_after_load[0])
@@ -640,9 +656,7 @@ print(year_list_after_load[0])
 print(author_list_after_load[0])
 print(text_list_after_load[0])
 print(favorite_list_after_load[0])
-"""
 
-"""
 for po in range(0, 1000):
     print(day_list[po])
     print(month_list[po])
@@ -652,4 +666,3 @@ for po in range(0, 1000):
     print(favorite_list[po])
     raw_input()
 """
-print("\n" + "files is loaded." + "\n")
