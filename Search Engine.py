@@ -1,5 +1,6 @@
 import os
 
+import time
 from pip._vendor.distlib.compat import raw_input
 from stemming.porter2 import stem
 
@@ -10,8 +11,6 @@ date_control = False
 author_control = False
 text_control = False
 favorite_control = False
-
-command_index_counter = 1
 
 day_temp = 0
 month_temp = 0
@@ -30,6 +29,8 @@ year_list = []
 author_list = []
 text_list = []
 favorite_list = []
+
+time_for_process = 0
 
 
 def Tokenizing(str):
@@ -260,79 +261,79 @@ def search(incidence_matrix, search_list):
         for incidence_matrix_pointer, incidence_matrix_index in enumerate(incidence_matrix):
             if incidence_matrix_pointer != 0:
                 if search_list_index == incidence_matrix_index[0]:
-                    for search_pointer, search_index in enumerate(incidence_matrix_index):
+                    for search_pointer, search_index2 in enumerate(incidence_matrix_index):
                         if search_pointer != 0:
-                            if search_index == "1":
+                            if search_index2 == "1":
                                 result_list.append(incidence_matrix[0][search_pointer])
 
-    print(result_list)
+    return result_list
+
+
+def print_search_list(search_result, file_name):
+    if not search_result:
+        print("\nno result in " + file_name + " tag.\n")
+    else:
+        print("\nresult in " + file_name + " tag : ")
+        for search_result_index in search_result:
+            print(search_result_index)
+
+
+def get_directory_from_user(message_to_show, dir_type):
+    while True:
+        print(message_to_show)
+        directory = raw_input()
+
+        if dir_type == 0:
+            if os.path.isdir(directory):
+                break
+            else:
+                print("your address is not a directory . please try again")
+                raw_input("Press Enter to continue...")
+                os.system('cls')
+        else:
+            if os.path.isfile(directory):
+                break
+            else:
+                print("your path is not for a file . please try again")
+                raw_input("Press Enter to continue...")
+                os.system('cls')
+
+    return directory
 
 
 # get files directory from user and check it for exist.
 print("--- welcome ---" + "\n" + "this programm will work just on the windows OS" + "\n")
-while True:
-    print("please insert your files directory to load it : ")
-    # directory = raw_input()
-    files_directory = 'C:\\Users\\rezaa\Downloads\Telegram Desktop\\2009'
 
-    if os.path.isdir(files_directory):
-        break
-    else:
-        print("your address is not a directory . please try again")
-        raw_input("Press Enter to continue...")
-        os.system('cls')
+files_directory = get_directory_from_user("please insert your files directory to load it : ", 0)
+stop_word_directory = get_directory_from_user("please insert your stop word file directory to load it : ", 1)
+doc_werb_directory_for_save = get_directory_from_user("please insert a directory for save doc_werb files : ", 0)
+doc_werb_directory_for_load = get_directory_from_user("please insert a directory for load doc_werb files : ", 0)
+dictionary_directory_for_save = get_directory_from_user("please insert a directory for save dictionary files : ", 0)
+dictionary_directory_for_load = get_directory_from_user("please insert a directory for load dictionary files : ", 0)
+incidence_directory_for_save = get_directory_from_user("please insert a directory for save incidence matrix files : ",
+                                                       0)
+incidence_directory_for_load = get_directory_from_user("please insert a directory for load incidence matrix files : ",
 
-# Red stop word file
-while True:
-    print("please insert your stop word file directory to load it : ")
-    # directory = raw_input()
-    stop_word_directory = "E:\\project\\bazyabi ettelaa'at\\project 1\\stopwords.txt"
+                                                       0)
+"""
+files_directory = "C:\\Users\\rezaa\\Downloads\\Telegram Desktop\\2009"
+stop_word_directory = "E:\\project\\bazyabi ettelaa'at\\project 1\\stopwords.txt"
+doc_werb_directory_for_save = "E:\\project\\bazyabi ettelaa'at\\project 1"
+doc_werb_directory_for_load = "E:\\project\\bazyabi ettelaa'at\\project 1"
+dictionary_directory_for_save = "E:\\project\\bazyabi ettelaa'at\\project 1"
+dictionary_directory_for_load = "E:\\project\\bazyabi ettelaa'at\\project 1"
+incidence_directory_for_save = "E:\\project\\bazyabi ettelaa'at\\project 1"
+incidence_directory_for_load = "E:\\project\\bazyabi ettelaa'at\\project 1"
+"""
 
-    if os.path.isfile(stop_word_directory):
-        break
-    else:
-        print("your address is not a directory . please try again")
-        raw_input("Press Enter to continue...")
-        os.system('cls')
+print("app is begin process , please be patient ...")
 
-while True:
-    print("please insert your directory that you want to save the document and werb files into it : ")
-    # directory = raw_input()
-    doc_werb_directory = "E:\\project\\bazyabi ettelaa'at\\project 1\\"
+start_time = time.clock()
 
-    if os.path.isfile(stop_word_directory):
-        break
-    else:
-        print("your address is not a directory . please try again")
-        raw_input("Press Enter to continue...")
-        os.system('cls')
-
-while True:
-    print("please insert your directory to load the werb_document files load from it : ")
-    # directory = raw_input()
-    doc_werb_directory_for_load = "E:\\project\\bazyabi ettelaa'at\\project 1\\"
-
-    if os.path.isfile(stop_word_directory):
-        break
-    else:
-        print("your address is not a directory . please try again")
-        raw_input("Press Enter to continue...")
-        os.system('cls')
-
-while True:
-    print("please insert your directory to save dictionarys into it : ")
-    # directory = raw_input()
-    dictionary_directory_for_save = "E:\\project\\bazyabi ettelaa'at\\project 1\\"
-
-    if os.path.isfile(stop_word_directory):
-        break
-    else:
-        print("your address is not a directory . please try again")
-        raw_input("Press Enter to continue...")
-        os.system('cls')
 # Read stop word file and create list of stop words
 stop_word_file = open(stop_word_directory, 'r')
 stop_word_list = stop_word_file.read().split()
+stop_word_file.close()
 
 # assign files to list to work those ile_in_processing
 list_of_files = os.listdir(files_directory)
@@ -344,6 +345,8 @@ for files_pointer in list_of_files:
 
     # import file into a list
     parse_list = f.read()
+
+    f.close()
 
     doc_counter = 0
     # define conditions for read the detail of text
@@ -383,7 +386,7 @@ for files_pointer in list_of_files:
             favorite_control = False
 
         elif string_temp == "</DOC>":
-            command_index_counter += 1
+            pass
 
         if date_control:
             if document_pointer == "/":
@@ -484,12 +487,18 @@ for files_pointer in list_of_files:
         raw_input()
     """
 
-write_list_to_file("day_file", day_list, doc_werb_directory)
-write_list_to_file("month_file", month_list, doc_werb_directory)
-write_list_to_file("year_file", year_list, doc_werb_directory)
-write_list_to_file("author_file", author_list, doc_werb_directory)
-write_list_to_file("text_file", text_list, doc_werb_directory)
-write_list_to_file("favorite_file", favorite_list, doc_werb_directory)
+write_list_to_file("day_file", day_list, doc_werb_directory_for_save)
+del day_list
+write_list_to_file("month_file", month_list, doc_werb_directory_for_save)
+del month_list
+write_list_to_file("year_file", year_list, doc_werb_directory_for_save)
+del year_list
+write_list_to_file("author_file", author_list, doc_werb_directory_for_save)
+del author_list
+write_list_to_file("text_file", text_list, doc_werb_directory_for_save)
+del text_list
+write_list_to_file("favorite_file", favorite_list, doc_werb_directory_for_save)
+del favorite_list
 
 # this place is end of first step of the project
 
@@ -541,19 +550,26 @@ del favorite_dictionary
 
 # this place is end of second step of the project
 
-day_dictionary_after_load_temp = open(doc_werb_directory_for_load + "\\" + "day_dictionary_file", 'r').read()
-month_dictionary_after_load_temp = open(doc_werb_directory_for_load + "\\" + "month_dictionary_file", 'r').read()
-year_dictionary_after_load_temp = open(doc_werb_directory_for_load + "\\" + "year_dictionary_file", 'r').read()
-author_dictionary_after_load_temp = open(doc_werb_directory_for_load + "\\" + "author_dictionary_file", 'r').read()
-text_dictionary_after_load_temp = open(doc_werb_directory_for_load + "\\" + "text_dictionary_file", 'r').read()
-favorite_dictionary_after_load_temp = open(doc_werb_directory_for_load + "\\" + "favorite_dictionary_file", 'r').read()
+day_dictionary_after_load_temp = open(dictionary_directory_for_load + "\\" + "day_dictionary_file", 'r').read()
+month_dictionary_after_load_temp = open(dictionary_directory_for_load + "\\" + "month_dictionary_file", 'r').read()
+year_dictionary_after_load_temp = open(dictionary_directory_for_load + "\\" + "year_dictionary_file", 'r').read()
+author_dictionary_after_load_temp = open(dictionary_directory_for_load + "\\" + "author_dictionary_file", 'r').read()
+text_dictionary_after_load_temp = open(dictionary_directory_for_load + "\\" + "text_dictionary_file", 'r').read()
+favorite_dictionary_after_load_temp = open(dictionary_directory_for_load + "\\" + "favorite_dictionary_file",
+                                           'r').read()
 
 day_dictionary_after_load = read_file_into_list(day_dictionary_after_load_temp)
+del day_dictionary_after_load_temp
 month_dictionary_after_load = read_file_into_list(month_dictionary_after_load_temp)
+del month_dictionary_after_load_temp
 year_dictionary_after_load = read_file_into_list(year_dictionary_after_load_temp)
+del year_dictionary_after_load_temp
 author_dictionary_after_load = read_file_into_list(author_dictionary_after_load_temp)
+del author_dictionary_after_load_temp
 text_dictionary_after_load = read_file_into_list(text_dictionary_after_load_temp)
+del text_dictionary_after_load_temp
 favorite_dictionary_after_load = read_file_into_list(favorite_dictionary_after_load_temp)
+del favorite_dictionary_after_load_temp
 
 day_list_after_load_temp2 = open(doc_werb_directory_for_load + "\\" + "day_file", 'r').read()
 month_list_after_load_temp2 = open(doc_werb_directory_for_load + "\\" + "month_file", 'r').read()
@@ -563,41 +579,60 @@ text_list_after_load_temp2 = open(doc_werb_directory_for_load + "\\" + "text_fil
 favorite_list_after_load_temp2 = open(doc_werb_directory_for_load + "\\" + "favorite_file", 'r').read()
 
 day_list_after_load2 = read_file_into_list(day_list_after_load_temp2)
+del day_list_after_load_temp2
 month_list_after_load2 = read_file_into_list(month_list_after_load_temp2)
+del month_list_after_load_temp2
 year_list_after_load2 = read_file_into_list(year_list_after_load_temp2)
+del year_list_after_load_temp2
 author_list_after_load2 = read_file_into_list(author_list_after_load_temp2)
+del author_list_after_load_temp2
 text_list_after_load2 = read_file_into_list(text_list_after_load_temp2)
+del text_list_after_load_temp2
 favorite_list_after_load2 = read_file_into_list(favorite_list_after_load_temp2)
+del favorite_list_after_load_temp2
 
 day_incidence_matrix = create_incidence_matrix(day_dictionary_after_load, day_list_after_load2)
+del day_dictionary_after_load
+del day_list_after_load2
 month_incidence_matrix = create_incidence_matrix(month_dictionary_after_load, month_list_after_load2)
+del month_dictionary_after_load
+del month_list_after_load2
 year_incidence_matrix = create_incidence_matrix(year_dictionary_after_load, year_list_after_load2)
+del year_dictionary_after_load
+del year_list_after_load2
 author_incidence_matrix = create_incidence_matrix(author_dictionary_after_load, author_list_after_load2)
+del author_dictionary_after_load
+del author_list_after_load2
 text_incidence_matrix = create_incidence_matrix(text_dictionary_after_load, text_list_after_load2)
+del text_dictionary_after_load
+del text_list_after_load2
 favorite_incidence_matrix = create_incidence_matrix(favorite_dictionary_after_load, favorite_list_after_load2)
+del favorite_dictionary_after_load
+del favorite_list_after_load2
 
-write_incidence_matrix_to_file("day_incidence_matrix", day_incidence_matrix, dictionary_directory_for_save)
+write_incidence_matrix_to_file("day_incidence_matrix", day_incidence_matrix, incidence_directory_for_save)
 del day_incidence_matrix
-write_incidence_matrix_to_file("month_incidence_matrix", month_incidence_matrix, dictionary_directory_for_save)
+write_incidence_matrix_to_file("month_incidence_matrix", month_incidence_matrix, incidence_directory_for_save)
 del month_incidence_matrix
-write_incidence_matrix_to_file("year_incidence_matrix", year_incidence_matrix, dictionary_directory_for_save)
+write_incidence_matrix_to_file("year_incidence_matrix", year_incidence_matrix, incidence_directory_for_save)
 del year_incidence_matrix
-write_incidence_matrix_to_file("author_incidence_matrix", author_incidence_matrix, dictionary_directory_for_save)
+write_incidence_matrix_to_file("author_incidence_matrix", author_incidence_matrix, incidence_directory_for_save)
 del author_incidence_matrix
-write_incidence_matrix_to_file("text_incidence_matrix", text_incidence_matrix, dictionary_directory_for_save)
+write_incidence_matrix_to_file("text_incidence_matrix", text_incidence_matrix, incidence_directory_for_save)
 del text_incidence_matrix
-write_incidence_matrix_to_file("favorite_incidence_matrix", favorite_incidence_matrix, dictionary_directory_for_save)
+write_incidence_matrix_to_file("favorite_incidence_matrix", favorite_incidence_matrix, incidence_directory_for_save)
 del favorite_incidence_matrix
 
 # this place is end of third step
 
-day_incidence_matrix_after_load_temp = open(doc_werb_directory_for_load + "\\" + "day_incidence_matrix", 'r').read()
-month_incidence_matrix_after_load_temp = open(doc_werb_directory_for_load + "\\" + "month_incidence_matrix", 'r').read()
-year_incidence_matrix_after_load_temp = open(doc_werb_directory_for_load + "\\" + "year_incidence_matrix", 'r').read()
-author_incidence_matrix_after_load_temp = open(doc_werb_directory_for_load + "\\" + "author_incidence_matrix",
+day_incidence_matrix_after_load_temp = open(incidence_directory_for_load + "\\" + "day_incidence_matrix", 'r').read()
+month_incidence_matrix_after_load_temp = open(incidence_directory_for_load + "\\" + "month_incidence_matrix",
+                                              'r').read()
+year_incidence_matrix_after_load_temp = open(incidence_directory_for_load + "\\" + "year_incidence_matrix", 'r').read()
+author_incidence_matrix_after_load_temp = open(incidence_directory_for_load + "\\" + "author_incidence_matrix",
                                                'r').read()
-text_incidence_matrix_after_load_temp = open(doc_werb_directory_for_load + "\\" + "text_incidence_matrix", 'r').read()
-favorite_incidence_matrix_after_load_temp = open(doc_werb_directory_for_load + "\\" + "favorite_incidence_matrix",
+text_incidence_matrix_after_load_temp = open(incidence_directory_for_load + "\\" + "text_incidence_matrix", 'r').read()
+favorite_incidence_matrix_after_load_temp = open(incidence_directory_for_load + "\\" + "favorite_incidence_matrix",
                                                  'r').read()
 
 day_incidence_matrix_after_load = read_file_into_list(day_incidence_matrix_after_load_temp)
@@ -613,11 +648,16 @@ del text_incidence_matrix_after_load_temp
 favorite_incidence_matrix_after_load = read_file_into_list(favorite_incidence_matrix_after_load_temp)
 del favorite_incidence_matrix_after_load_temp
 
+time_for_process = time.clock() - start_time
+
 print("\n" + "files is loaded." + "\n")
 
 while True:
 
     search_index = read_search_index()
+
+    start_time = time.clock()
+
     search_case_list = Tokenizing(search_index[1])
     search_case_list = Normalizing(search_case_list)
     search_case_list = Stop_word_remove(search_case_list, stop_word_list)
@@ -626,28 +666,64 @@ while True:
     # print(search_case_list)
     # print(stop_word_list)
 
+    day_search_result = []
+    month_search_result = []
+    year_search_result = []
+    author_search_result = []
+    text_search_result = []
+    favorite_search_result = []
+
     if int(search_index[0]) == 1:
-        search(day_incidence_matrix_after_load, search_case_list)
+        day_search_result = search(day_incidence_matrix_after_load, search_case_list)
     elif int(search_index[0]) == 2:
-        search(month_incidence_matrix_after_load, search_case_list)
+        month_search_result = search(month_incidence_matrix_after_load, search_case_list)
     elif int(search_index[0]) == 3:
-        search(year_incidence_matrix_after_load, search_case_list)
+        year_search_result = search(year_incidence_matrix_after_load, search_case_list)
     elif int(search_index[0]) == 4:
-        search(author_incidence_matrix_after_load, search_case_list)
+        author_search_result = search(author_incidence_matrix_after_load, search_case_list)
     elif int(search_index[0]) == 5:
-        search(text_incidence_matrix_after_load, search_case_list)
+        text_search_result = search(text_incidence_matrix_after_load, search_case_list)
     elif int(search_index[0]) == 6:
-        search(favorite_incidence_matrix_after_load, search_case_list)
+        favorite_search_result = search(favorite_incidence_matrix_after_load, search_case_list)
     elif int(search_index[0]) == 7:
-        search(day_incidence_matrix_after_load, search_case_list)
-        search(month_incidence_matrix_after_load, search_case_list)
-        search(year_incidence_matrix_after_load, search_case_list)
-        search(author_incidence_matrix_after_load, search_case_list)
-        search(text_incidence_matrix_after_load, search_case_list)
-        search(favorite_incidence_matrix_after_load, search_case_list)
+        day_search_result = search(day_incidence_matrix_after_load, search_case_list)
+        month_search_result = search(month_incidence_matrix_after_load, search_case_list)
+        year_search_result = search(year_incidence_matrix_after_load, search_case_list)
+        author_search_result = search(author_incidence_matrix_after_load, search_case_list)
+        text_search_result = search(text_incidence_matrix_after_load, search_case_list)
+        favorite_search_result = search(favorite_incidence_matrix_after_load, search_case_list)
 
+    print_search_list(day_search_result, "day")
+    print_search_list(month_search_result, "month")
+    print_search_list(year_search_result, "year")
+    print_search_list(author_search_result, "author")
+    print_search_list(text_search_result, "text")
+    print_search_list(favorite_search_result, "favorite")
 
+    del day_search_result
+    del month_search_result
+    del year_search_result
+    del author_search_result
+    del text_search_result
+    del favorite_search_result
 
+    end_time = time.clock() - start_time
+
+    print("\nrun time = ")
+    print(time_for_process + end_time)
+    print("second\n")
+
+    raw_input("enter to continue ... ")
+
+"""
+del search_case_list
+del day_incidence_matrix_after_load
+del month_incidence_matrix_after_load
+del year_incidence_matrix_after_load
+del author_incidence_matrix_after_load
+del text_incidence_matrix_after_load
+del favorite_incidence_matrix_after_load
+"""
 
 """
 print(day_list_after_load[0])
